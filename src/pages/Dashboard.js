@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { crisisService, authService } from '../services/api';
+import { crisisService } from '../services/api';
+import { useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import '../styles/Dashboard.css';
 
@@ -14,11 +15,7 @@ function Dashboard() {
         need_type: ''
     });
 
-    useEffect(() => {
-        fetchCrises();
-    }, [filter]);
-
-    const fetchCrises = async () => {
+    const fetchCrises = useCallback(async () => {
         setLoading(true);
         try {
             const response = await crisisService.getAllCrises(filter);
@@ -30,7 +27,11 @@ function Dashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filter]);
+
+    useEffect(() => {
+        fetchCrises();
+    }, [fetchCrises]);
 
     const getUrgencyClass = (level) => {
         switch(level) {

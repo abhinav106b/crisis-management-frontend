@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { crisisService } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -10,11 +10,7 @@ function CrisisDetails() {
     const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchCrisisDetails();
-    }, [id]);
-
-    const fetchCrisisDetails = async () => {
+    const fetchCrisisDetails = useCallback(async () => {
         try {
             const response = await crisisService.getCrisisById(id);
             if (response.success) {
@@ -26,7 +22,11 @@ function CrisisDetails() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
+
+    useEffect(() => {
+        fetchCrisisDetails();
+    }, [fetchCrisisDetails]);
 
     if (loading) return <div><Navbar /><div style={{padding: '20px'}}>Loading...</div></div>;
     if (!crisis) return <div><Navbar /><div style={{padding: '20px'}}>Crisis not found</div></div>;
